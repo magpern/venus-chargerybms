@@ -30,20 +30,42 @@ MbPage {
 		}
 
 		MbItemRow {
-			description: qsTr("Cells (1/2/3)")
+			description: qsTr("Cells (1/2/3/4)")
 			values: [
 				MbTextBlock { item { bind: service.path("/Impedances/Cell1"); } width: 70; height: 25 },
 				MbTextBlock { item { bind: service.path("/Impedances/Cell2"); } width: 70; height: 25 },
-				MbTextBlock { item { bind: service.path("/Impedances/Cell3"); } width: 70; height: 25 }
+				MbTextBlock { item { bind: service.path("/Impedances/Cell3"); } width: 70; height: 25 },
+				MbTextBlock { item { bind: service.path("/Impedances/Cell4"); } width: 70; height: 25 }
 			]
 		}
 
 		MbItemRow {
-			description: qsTr("Cells (4/5/6)")
+			description: qsTr("Cells (5/6/7/8)")
 			values: [
-				MbTextBlock { item { bind: service.path("/Impedances/Cell4"); } width: 70; height: 25 },
 				MbTextBlock { item { bind: service.path("/Impedances/Cell5"); } width: 70; height: 25 },
-				MbTextBlock { item { bind: service.path("/Impedances/Cell6"); } width: 70; height: 25 }
+				MbTextBlock { item { bind: service.path("/Impedances/Cell6"); } width: 70; height: 25 },
+				MbTextBlock { item { bind: service.path("/Impedances/Cell7"); } width: 70; height: 25 },
+				MbTextBlock { item { bind: service.path("/Impedances/Cell8"); } width: 70; height: 25 }
+			]
+		}
+
+		MbItemRow {
+			description: qsTr("Cells (9/10/11/12)")
+			values: [
+				MbTextBlock { item { bind: service.path("/Impedances/Cell9"); } width: 70; height: 25 },
+				MbTextBlock { item { bind: service.path("/Impedances/Cell10"); } width: 70; height: 25 },
+				MbTextBlock { item { bind: service.path("/Impedances/Cell11"); } width: 70; height: 25 },
+				MbTextBlock { item { bind: service.path("/Impedances/Cell12"); } width: 70; height: 25 }
+			]
+		}
+
+		MbItemRow {
+			description: qsTr("Cells (13/14/15/16)")
+			values: [
+				MbTextBlock { item { bind: service.path("/Impedances/Cell13"); } width: 70; height: 25 },
+				MbTextBlock { item { bind: service.path("/Impedances/Cell14"); } width: 70; height: 25 },
+				MbTextBlock { item { bind: service.path("/Impedances/Cell15"); } width: 70; height: 25 },
+				MbTextBlock { item { bind: service.path("/Impedances/Cell16"); } width: 70; height: 25 }
 			]
 		}
 

@@ -6,7 +6,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	echo "Download driver and library"
 
-	wget https://github.com/Tobi177/venus-chargerybms/archive/master.zip
+	wget https://github.com/magpern/venus-chargerybms/archive/master.zip
 	unzip master.zip
 	rm master.zip
 
@@ -42,14 +42,6 @@ then
 	cp venus-chargerybms-master/gui/qml/PageBatteryChargeryBMSImpedances.qml /opt/victronenergy/gui/qml
 	cp venus-chargerybms-master/gui/qml/PageBatteryChargeryBMSVoltages.qml /opt/victronenergy/gui/qml
 	cp venus-chargerybms-master/gui/qml/PageMain.qml /opt/victronenergy/gui/qml
-
-	read -p "Setup new gui overview? [Y to proceed]" -n 1 -r
-	echo    # (optional) move to a new line
-	if [[ $REPLY =~ ^[Yy]$ ]]
-	then
-		echo "Setup new overview"
-		cp venus-chargerybms-master/gui/qml/OverviewTiles.qml /opt/victronenergy/gui/qml
-	fi
 
 	echo "To finish, reboot the Venus OS device"
 fi

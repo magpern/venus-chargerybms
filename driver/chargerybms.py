@@ -30,7 +30,7 @@ driver = {
 	'servicename' : "chargerybms",
 	'instance'    : 1,
 	'id'          : 0x01,
-	'version'     : 1.2,
+	'version'     : 1.25,
 	'serial'      : "CHGBMS11062020A1",
 	'connection'  : "com.victronenergy.battery.ttyCHGBMS01"
 }
@@ -160,6 +160,11 @@ if args.victron:
 	dbusservice.add_path('/Impedances/Max',                -1)
 	dbusservice.add_path('/Impedances/Min',                -1)
 	dbusservice.add_path('/Impedances/UpdateTimestamp',    -1)
+	dbusservice.add_path('/Dc/0/Voltage',                  -1)
+	dbusservice.add_path('/Dc/0/Current',                  -1)
+	dbusservice.add_path('/Dc/0/Power',                    -1)
+	dbusservice.add_path('/Dc/0/Temperature',              -1)
+	dbusservice.add_path('/Soc',                           -1)
 
 
 	# Create the real values paths
@@ -847,10 +852,15 @@ def parse_packet(packet):
 									BMS_STATUS['bms']['current']['text'] = ""
 								
 								if args.victron:
-									dbusservice["/Info/CurrentMode"] = BMS_STATUS['bms']['current_mode']['text']
-									dbusservice["/Info/Current"]     = BMS_STATUS['bms']['current']['text']
+									dbusservice["/Info/CurrentMode"]     = BMS_STATUS['bms']['current_mode']['text']
+									dbusservice["/Info/Current"]         = BMS_STATUS['bms']['current']['text']
 									dbusservice["/Raw/Info/CurrentMode"] = BMS_STATUS['bms']['current_mode']['value']
 									dbusservice["/Raw/Info/Current"]     = BMS_STATUS['bms']['current']['value']
+									dbusservice["/Dc/0/Current"]         = BMS_STATUS['bms']['current']['value']
+
+								watt = BMS_STATUS['bms']['current']['value'] * BMS_STATUS['voltages']['agg_voltages']['sum']['value']
+								if args.victron:
+									dbusservice["/Dc/0/Power"]     = watt
 
 								# current temperatures
 								BMS_STATUS['bms']['temperature']['sensor_t1']['value'] = get_temperature_value(ord(packet[9]), ord(packet[10]))
@@ -863,6 +873,7 @@ def parse_packet(packet):
 									dbusservice["/Info/Temp/Sensor2"] = BMS_STATUS['bms']['temperature']['sensor_t2']['text']
 									dbusservice["/Raw/Info/Temp/Sensor1"] = BMS_STATUS['bms']['temperature']['sensor_t1']['value']
 									dbusservice["/Raw/Info/Temp/Sensor2"] = BMS_STATUS['bms']['temperature']['sensor_t2']['value']
+									dbusservice["/Dc/0/Temperature"] = max(BMS_STATUS['bms']['temperature']['sensor_t1']['value'], BMS_STATUS['bms']['temperature']['sensor_t2']['value'])
 
 								# soc value
 								BMS_STATUS['bms']['soc']['value'] = ord(packet[13])
@@ -870,6 +881,7 @@ def parse_packet(packet):
 								if args.victron:
 									dbusservice["/Info/Soc"] = BMS_STATUS['bms']['soc']['text']
 									dbusservice["/Raw/Info/Soc"] = BMS_STATUS['bms']['soc']['value']
+									dbusservice["/Soc"] = BMS_STATUS['bms']['soc']['value']
 								
 								# update timestamp
 								current_date = datetime.datetime.now()
@@ -1173,6 +1185,7 @@ def parse_packet(packet):
 								if args.victron:
 									dbusservice["/Voltages/Sum"]      = BMS_STATUS['voltages']['agg_voltages']['sum']['text']
 									dbusservice["/Raw/Voltages/Sum"]  = BMS_STATUS['voltages']['agg_voltages']['sum']['value']
+									dbusservice["/Dc/0/Voltage"]	  = BMS_STATUS['voltages']['agg_voltages']['sum']['value']
 									dbusservice["/Voltages/Max"]      = BMS_STATUS['voltages']['agg_voltages']['max']['text']
 									dbusservice["/Raw/Voltages/Max"]  = BMS_STATUS['voltages']['agg_voltages']['max']['value']
 									dbusservice["/Voltages/Min"]      = BMS_STATUS['voltages']['agg_voltages']['min']['text']
