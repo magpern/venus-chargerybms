@@ -12,7 +12,7 @@ Many Thanks!
  - Use The Chargery BMS as a Battery Monitor
  - GUI is default for 16 cells
  - No custom overview page
- - Allow usade of fake FTDI chip (or atleast address the issue)
+ - Allow usage of fake FTDI chip (or atleast address the issue)
 
 # Description
 
@@ -23,14 +23,6 @@ and grabs the data form the RS232 USB interface every second. Example Images:
 ![ChargeryBMS Voltages](https://raw.githubusercontent.com/Tobi177/venus-chargerybms/master/examples/chargerybmsvoltages.png)
 ![ChargeryBMS Impedances](https://raw.githubusercontent.com/Tobi177/venus-chargerybms/master/examples/chargerybmsimpedances.png)
 
-# Installation Venus OS
- - Enable root access on Venus OS [https://www.victronenergy.com/live/ccgx:root_access]
- - Download the file /install/install.sh from this archive
- - Use it at you rown risk!
- - Execute the file, the latest versions of the the script and victron python library are downloaded
- - Installation will be done (remember we need a FT232RL USB adapter, check the requirements)
- - Reboot your device
-
 # Requirements
 
 - Chargery BMS
@@ -39,10 +31,31 @@ and grabs the data form the RS232 USB interface every second. Example Images:
 
 # Installation on Venus OS
 - Access Venus os via SSH with root: [https://www.victronenergy.com/live/ccgx:root_access]
-- Download the install.sh under /install/install.sh
-- run it with `sh install.sh`
+- Download the install.sh AND ftdi_serialnumber under /install/
+	Edit the serial number file
+	```sh
+	nano ftdi_serialnumber
+	```
+	type in the serial number of your FTDI usb device, without a line break. Save and exit nano (Ctrl + x and y)
+
+	If you don't know the serial number of yor device use
+	Edit the serial number file
+	```sh
+	usb-devices
+	```
+	and you can figure it out.
+- change the permission of the install.sh by typing
+	```sh
+	chmod +x install.sh
+	```
+- run it with `./install.sh`
 - reboot
 - connect the Battery and FTDI
+
+If you encounter problems running the install.sh, like bad line breaks (edited file on windows) you can clean the file with this command
+```sh
+sed -i -e 's/\r$//' install.sh
+```
 
 # Notes
 - The driver must be reinstalled after a firmware upgrade

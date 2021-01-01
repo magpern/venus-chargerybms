@@ -6,19 +6,25 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	echo "Download driver and library"
 
-	wget https://github.com/magpern/venus-chargerybms/archive/master.zip
-	unzip master.zip
-	rm master.zip
+	wget -nv https://github.com/magpern/venus-chargerybms/archive/Master.zip
+	unzip -o -q Master.zip
+	rm Master.zip
 
-	wget https://github.com/victronenergy/velib_python/archive/master.zip
-	unzip master.zip
+	wget -nv https://github.com/victronenergy/velib_python/archive/master.zip
+	unzip -o -q master.zip
 	rm master.zip
 
 	mkdir -p venus-chargerybms-master/ext/velib_python
 	cp -R velib_python-master/* venus-chargerybms-master/ext/velib_python
 
 	echo "Add Chargery entries to serial-starter"
-	sed -i  's/ENV{VE_SERVICE}="rs485:default"/ENV{VE_SERVICE}="rs485:default:chargerybms"/g' /etc/udev/rules.d/serial-starter.rules
+	serialnumber=$(head -n 1 ftdi_serialnumber)
+
+	grep -q -F $serialnumber /etc/udev/rules.d/serial-starter.rules
+	if [ $? -ne 0 ]; then
+		echo 'ACTION=="add", ATTRS{serial}=="'$serialnumber'", ENV{VE_SERVICE}="chargerybms"' >> /etc/udev/rules.d/serial-starter.rules
+	fi
+	
 	sed -i  '/service.*imt.*dbus-imt-si-rs485tc/a service chargerybms     chargerybms' /etc/venus/serial-starter.conf
 
 	echo "Install Chargery driver"
@@ -32,7 +38,7 @@ then
 	chmod +x /opt/victronenergy/chargerybms/service/run
 	chmod +x /opt/victronenergy/chargerybms/service/log/run
 
-	ln -s /opt/victronenergy/chargerybms/service /service/chargerybms
+	ln -sf /opt/victronenergy/chargerybms/service /service/chargerybms
 
 	echo "Copy gui files"
 
