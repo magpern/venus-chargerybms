@@ -6,9 +6,9 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	echo "Download driver and library"
 
-	wget -nv https://github.com/magpern/venus-chargerybms/archive/Master.zip
-	unzip -o -q Master.zip
-	rm Master.zip
+	wget -nv https://github.com/magpern/venus-chargerybms/archive/master.zip
+	unzip -o -q master.zip
+	rm master.zip
 
 	wget -nv https://github.com/victronenergy/velib_python/archive/master.zip
 	unzip -o -q master.zip
