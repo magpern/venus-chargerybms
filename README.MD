@@ -39,7 +39,6 @@ and grabs the data form the RS232 USB interface every second. Example Images:
 	type in the serial number of your FTDI usb device, without a line break. Save and exit nano (Ctrl + x and y)
 
 	If you don't know the serial number of yor device use
-	Edit the serial number file
 	```sh
 	usb-devices
 	```
