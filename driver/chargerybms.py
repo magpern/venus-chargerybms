@@ -21,7 +21,7 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
-    # filename='log.txt')
+    #filename='/home/root/log.txt')
 
 
 # connect and register to dbus
@@ -30,7 +30,7 @@ driver = {
 	'servicename' : "chargerybms",
 	'instance'    : 1,
 	'id'          : 0x01,
-	'version'     : 1.25,
+	'version'     : 1.26,
 	'serial'      : "CHGBMS11062020A1",
 	'connection'  : "com.victronenergy.battery.ttyCHGBMS01"
 }
@@ -97,6 +97,7 @@ if args.victron:
 	dbusservice.add_path('/Info/Temp/Sensor1',             -1)
 	dbusservice.add_path('/Info/Temp/Sensor2',             -1)
 	dbusservice.add_path('/Info/ChargeEndVoltage',         -1)
+	dbusservice.add_path('/Info/DischargeEndVoltage',      -1)
 	dbusservice.add_path('/Info/UpdateTimestamp',          -1)
 	dbusservice.add_path('/Voltages/Cell1',                -1)
 	dbusservice.add_path('/Voltages/Cell2',                -1)
@@ -174,6 +175,7 @@ if args.victron:
 	dbusservice.add_path('/Raw/Info/Temp/Sensor1',             -1)
 	dbusservice.add_path('/Raw/Info/Temp/Sensor2',             -1)
 	dbusservice.add_path('/Raw/Info/ChargeEndVoltage',         -1)
+	dbusservice.add_path('/Raw/Info/DischargeEndVoltage',      -1)
 	dbusservice.add_path('/Raw/Info/UpdateTimestamp',          -1)
 	dbusservice.add_path('/Raw/Voltages/Cell1',                -1)
 	dbusservice.add_path('/Raw/Voltages/Cell2',                -1)
@@ -246,7 +248,7 @@ PACKET_STATUS_IMPEDANCES  = 0x58
 
 PACKET_LENGTH_MINIMUM            = 10
 PACKET_LENGTH_STATUS_CELLS       = [29, 45, 61]
-PACKET_LENGTH_STATUS_BMS         = [15]
+PACKET_LENGTH_STATUS_BMS         = [19]
 
 # Special handling here: the impedances packet length is dynamically
 # and depends on how many cells are monitored. The minimum length of
@@ -268,6 +270,10 @@ MINUS_TEMPERATURE_OFFSET = 65000
 BMS_STATUS = {
 	'bms' : { 
 		'charged_end_voltage' : {
+			'value' : -1.000,
+			'text' : ""
+		},
+		'discharged_end_voltage' : {
 			'value' : -1.000,
 			'text' : ""
 		},
@@ -587,6 +593,8 @@ def reset_status_values():
 
 	BMS_STATUS['bms']['charged_end_voltage']['value'] = -1
 	BMS_STATUS['bms']['charged_end_voltage']['text']  = ""
+	BMS_STATUS['bms']['discharged_end_voltage']['value'] = -1
+	BMS_STATUS['bms']['discharged_end_voltage']['text']  = ""
 	BMS_STATUS['bms']['current_mode']['value'] = -1
 	BMS_STATUS['bms']['current_mode']['text']  = ""
 	BMS_STATUS['bms']['current']['value'] = -1
@@ -889,6 +897,13 @@ def parse_packet(packet):
 									dbusservice["/Info/Soc"] = BMS_STATUS['bms']['soc']['text']
 									dbusservice["/Raw/Info/Soc"] = BMS_STATUS['bms']['soc']['value']
 									dbusservice["/Soc"] = BMS_STATUS['bms']['soc']['value']
+
+								# discharge end voltage
+								BMS_STATUS['bms']['discharged_end_voltage']['value'] = get_voltage_value(ord(packet[14]), ord(packet[15]))
+								BMS_STATUS['bms']['discharged_end_voltage']['text'] = "{:.2f}".format(BMS_STATUS['bms']['discharged_end_voltage']['value']) + "V"
+								if args.victron:
+									dbusservice["/Info/DischargeEndVoltage"] = BMS_STATUS['bms']['discharged_end_voltage']['text']
+									dbusservice["/Raw/Info/DischargeEndVoltage"] = BMS_STATUS['bms']['discharged_end_voltage']['value']
 								
 								# update timestamp
 								current_date = datetime.datetime.now()
@@ -898,14 +913,14 @@ def parse_packet(packet):
 									dbusservice["/Info/UpdateTimestamp"] = BMS_STATUS['bms']['timestamp']['text']
 									dbusservice["/Raw/Info/UpdateTimestamp"] = BMS_STATUS['bms']['timestamp']['value']
 
-
 								# print (BMS_STATUS)
 								logging.info("BMS Status [SOC|" + BMS_STATUS['bms']['soc']['text'] +
 									"][MODE|" + BMS_STATUS['bms']['current_mode']['text'] + 
 									"][CURRENT|" + BMS_STATUS['bms']['current']['text'] + 
 									"][T1|" + BMS_STATUS['bms']['temperature']['sensor_t1']['text'] + 
 									"][T2|" + BMS_STATUS['bms']['temperature']['sensor_t1']['text'] + 
-									"][MAX CHARGE VOLTAGE|" + BMS_STATUS['bms']['charged_end_voltage']['text'] + "]") 
+									"][MAX CHARGE VOLTAGE|" + BMS_STATUS['bms']['charged_end_voltage']['text'] +
+									"][MIN DISCHARGE VOLTAGE|" + BMS_STATUS['bms']['discharged_end_voltage']['text'] + "]") 
 
 							else:
 								logging.info("Packet Checksum wrong, skip packet")
