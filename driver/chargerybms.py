@@ -20,8 +20,8 @@ os.environ['TZ'] = 'Europe/Berlin'
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S')
-    #filename='/home/root/log.txt')
+    datefmt='%Y-%m-%d %H:%M:%S',
+    filename='/home/root/log.txt')
 
 
 # connect and register to dbus
@@ -98,6 +98,8 @@ if args.victron:
 	dbusservice.add_path('/Info/Temp/Sensor2',             -1)
 	dbusservice.add_path('/Info/ChargeEndVoltage',         -1)
 	dbusservice.add_path('/Info/DischargeEndVoltage',      -1)
+	dbusservice.add_path('/Info/ChargeAllowed',            -1)
+	dbusservice.add_path('/Info/DischargeAllowed',         -1)
 	dbusservice.add_path('/Info/UpdateTimestamp',          -1)
 	dbusservice.add_path('/Voltages/Cell1',                -1)
 	dbusservice.add_path('/Voltages/Cell2',                -1)
@@ -176,6 +178,8 @@ if args.victron:
 	dbusservice.add_path('/Raw/Info/Temp/Sensor2',             -1)
 	dbusservice.add_path('/Raw/Info/ChargeEndVoltage',         -1)
 	dbusservice.add_path('/Raw/Info/DischargeEndVoltage',      -1)
+	dbusservice.add_path('/Raw/Info/ChargeAllowed',            -1)
+	dbusservice.add_path('/Raw/Info/DischargeAllowed',         -1)
 	dbusservice.add_path('/Raw/Info/UpdateTimestamp',          -1)
 	dbusservice.add_path('/Raw/Voltages/Cell1',                -1)
 	dbusservice.add_path('/Raw/Voltages/Cell2',                -1)
@@ -275,6 +279,14 @@ BMS_STATUS = {
 		},
 		'discharged_end_voltage' : {
 			'value' : -1.000,
+			'text' : ""
+		},
+		'discharge_allowed' : {
+			'value' : -1,
+			'text' : ""
+		},
+		'charge_allowed' : {
+			'value' : -1,
 			'text' : ""
 		},
 		'current_mode'        : {
@@ -571,6 +583,7 @@ BMS_STATUS = {
 }
 
 # example network packets form the chargery community protocol manual v1.25
+# number 8 complyes with v1.26
 BMS_TEST_PACKETS = {
 	1 : bytearray.fromhex('2424570F0E240100E6008100845B27'),
 	2 : bytearray.fromhex('2424570F0E240100E4008100845B25'),
@@ -578,7 +591,8 @@ BMS_TEST_PACKETS = {
 	4 : bytearray.fromhex('2424562D0CFD0D040D040D020D030D040D060D010D080D020D050CFE0D060CFB0D0F0CFC76FED50263140E0095'),
     5 : bytearray.fromhex('2424582801E4000100030003000300020003000000000001000100010000000500020003000300CC'),
 	6 : bytearray.fromhex('2424570F0E240100E4008300845B27'),
-	7 : bytearray.fromhex('24245814012a000900040007000b000b00070010')
+	7 : bytearray.fromhex('24245814012a000900040007000b000b00070010'),
+	8 : bytearray.fromhex('242457130e42000117008d00812f0af0000051')
 }
 
 
@@ -597,6 +611,10 @@ def reset_status_values():
 	BMS_STATUS['bms']['discharged_end_voltage']['text']  = ""
 	BMS_STATUS['bms']['current_mode']['value'] = -1
 	BMS_STATUS['bms']['current_mode']['text']  = ""
+	BMS_STATUS['bms']['charge_allowed']['value'] = -1
+	BMS_STATUS['bms']['charge_allowed']['text']  = ""
+	BMS_STATUS['bms']['discharge_allowed']['value'] = -1
+	BMS_STATUS['bms']['discharge_allowed']['text']  = ""
 	BMS_STATUS['bms']['current']['value'] = -1
 	BMS_STATUS['bms']['current']['text']  = ""
 	BMS_STATUS['bms']['temperature']['sensor_t1']['value'] = -1
@@ -905,6 +923,30 @@ def parse_packet(packet):
 									dbusservice["/Info/DischargeEndVoltage"] = BMS_STATUS['bms']['discharged_end_voltage']['text']
 									dbusservice["/Raw/Info/DischargeEndVoltage"] = BMS_STATUS['bms']['discharged_end_voltage']['value']
 								
+								# charge_allowed
+								bms_charge_allowed = ord(packet[16])
+								if (bms_charge_allowed == 0x00):
+									BMS_STATUS['bms']['charge_allowed']['value'] = 0
+									BMS_STATUS['bms']['charge_allowed']['text']  = "Yes"
+								elif (bms_charge_allowed == 0x01):
+									BMS_STATUS['bms']['charge_allowed']['value'] = 1
+									BMS_STATUS['bms']['charge_allowed']['text']  = "No"
+
+								# discharge allowed
+								bms_discharge_allowed = ord(packet[17])
+								if (bms_discharge_allowed == 0x00):
+									BMS_STATUS['bms']['discharge_allowed']['value'] = 0
+									BMS_STATUS['bms']['discharge_allowed']['text']  = "Yes"
+								elif (bms_charge_allowed == 0x01):
+									BMS_STATUS['bms']['discharge_allowed']['value'] = 1
+									BMS_STATUS['bms']['discharge_allowed']['text']  = "No"
+
+								if args.victron:
+									dbusservice["/Info/DischargeAllowed"] = BMS_STATUS['bms']['discharge_allowed']['text']
+									dbusservice["/Raw/Info/DischargeAllowed"] = BMS_STATUS['bms']['discharge_allowed']['value']
+									dbusservice["/Info/ChargeAllowed"] = BMS_STATUS['bms']['charge_allowed']['text']
+									dbusservice["/Raw/Info/ChargeAllowed"] = BMS_STATUS['bms']['charge_allowed']['value']		
+
 								# update timestamp
 								current_date = datetime.datetime.now()
 								BMS_STATUS['bms']['timestamp']['value'] = time.time()
@@ -920,7 +962,9 @@ def parse_packet(packet):
 									"][T1|" + BMS_STATUS['bms']['temperature']['sensor_t1']['text'] + 
 									"][T2|" + BMS_STATUS['bms']['temperature']['sensor_t1']['text'] + 
 									"][MAX CHARGE VOLTAGE|" + BMS_STATUS['bms']['charged_end_voltage']['text'] +
-									"][MIN DISCHARGE VOLTAGE|" + BMS_STATUS['bms']['discharged_end_voltage']['text'] + "]") 
+									"][MIN DISCHARGE VOLTAGE|" + BMS_STATUS['bms']['discharged_end_voltage']['text'] +
+									"][CHARGE ALLOWED|" + BMS_STATUS['bms']['charge_allowed']['text'] +
+									"][DISCHARGE ALLOWED|" + BMS_STATUS['bms']['discharge_allowed']['text'] + "]") 
 
 							else:
 								logging.info("Packet Checksum wrong, skip packet")
