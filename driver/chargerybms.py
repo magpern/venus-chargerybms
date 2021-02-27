@@ -881,19 +881,27 @@ def parse_packet(packet):
 									BMS_STATUS['bms']['current']['text'] = str(BMS_STATUS['bms']['current']['value']) + "A"
 								else:
 									BMS_STATUS['bms']['current_mode']['value'] = -1
-									BMS_STATUS['bms']['current_mode']['text']  = ""
-									BMS_STATUS['bms']['current']['text'] = ""
+									BMS_STATUS['bms']['current_mode']['text']  = "Unknown"
+									BMS_STATUS['bms']['current']['text'] = "0"
 								
+								watt = BMS_STATUS['bms']['current']['value'] * BMS_STATUS['voltages']['agg_voltages']['sum']['value']
+
 								if args.victron:
 									dbusservice["/Info/CurrentMode"]     = BMS_STATUS['bms']['current_mode']['text']
-									dbusservice["/Info/Current"]         = BMS_STATUS['bms']['current']['text']
 									dbusservice["/Raw/Info/CurrentMode"] = BMS_STATUS['bms']['current_mode']['value']
-									dbusservice["/Raw/Info/Current"]     = BMS_STATUS['bms']['current']['value']
-									dbusservice["/Dc/0/Current"]         = BMS_STATUS['bms']['current']['value']
+									if (bms_current_mode == 0x00):
+										#Discharge
+										dbusservice["/Info/Current"]         = -1 * BMS_STATUS['bms']['current']['text']
+										dbusservice["/Raw/Info/Current"]     = -1 * BMS_STATUS['bms']['current']['value']
+										dbusservice["/Dc/0/Current"]         = -1 * BMS_STATUS['bms']['current']['value']
+										dbusservice["/Dc/0/Power"]     = -1 * watt
+									else:
+										#Charging and idle
+										dbusservice["/Info/Current"]         = BMS_STATUS['bms']['current']['text']
+										dbusservice["/Raw/Info/Current"]     = BMS_STATUS['bms']['current']['value']
+										dbusservice["/Dc/0/Current"]         = BMS_STATUS['bms']['current']['value']
+										dbusservice["/Dc/0/Power"]     = watt
 
-								watt = BMS_STATUS['bms']['current']['value'] * BMS_STATUS['voltages']['agg_voltages']['sum']['value']
-								if args.victron:
-									dbusservice["/Dc/0/Power"]     = watt
 
 								# current temperatures
 								BMS_STATUS['bms']['temperature']['sensor_t1']['value'] = get_temperature_value(ord(packet[9]), ord(packet[10]))
