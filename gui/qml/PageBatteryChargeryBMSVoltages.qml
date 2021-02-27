@@ -68,6 +68,13 @@ MbPage {
 		}
 
 		MbItemRow {
+			description: qsTr("Discharge End Voltage")
+			values: [
+				MbTextBlock { item { bind: service.path("/Info/DischargeEndVoltage"); } width: 70; height: 25 }
+			]
+		}
+
+		MbItemRow {
 			description: qsTr("Data Timestamp")
 			values: [
 				MbTextBlock { item { bind: service.path("/Voltages/UpdateTimestamp"); } width: 215; height: 25 }
