@@ -29,19 +29,19 @@ MbPage {
 		}
 
 		MbItemRow {
-			description: qsTr("Charge/discharge allowed")
-			values: [
-				MbTextBlock { item { bind: service.path("/Info/ChargeAllowed"); } width: 70; height: 25 },
-				MbTextBlock { item { bind: service.path("/Info/DischargeAllowed"); } width: 70; height: 25 }
-			]
-		}
-
-		MbItemRow {
 			description: qsTr("State of Charge")
 			values: [
 				MbTextBlock { item { bind: service.path("/Voltages/BatteryCapacityWH"); } height: 25 },
 				MbTextBlock { item { bind: service.path("/Voltages/BatteryCapacityAH"); }  width: 70; height: 25 },
 				MbTextBlock { item { bind: service.path("/Info/Soc"); } width: 70; height: 25 }
+			]
+		}
+
+		MbItemRow {
+			description: qsTr("Relays (Charge/Discharge)")
+			values: [
+				MbTextBlock { item { bind: service.path("/Info/ChargeRelayStatus"); }  width: 70; height: 25 },
+				MbTextBlock { item { bind: service.path("/Info/DischargeRelayStatus"); } width: 70; height: 25 }
 			]
 		}
 
