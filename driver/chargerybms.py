@@ -1469,7 +1469,7 @@ def parse_packet(packet):
                                         BMS_STATUS['impedances']['cell'+str(i)+'_impedance']['value'] = get_cell_impedance(ord(packet[7+(2*(i-1))]), ord(packet[8+(2*(i-1))]))
                                         BMS_STATUS['impedances']['cell'+str(i)+'_impedance']['text'] = "{:.1f}".format(BMS_STATUS['impedances']['cell'+str(i)+'_impedance']['value']) + "m" + SPECIAL_DISPLAY_SYMBOLS['ohm']
                                         if args.victron:
-                                            dbusservice["/Impedances/Cell"+str(i)] = BMS_STATUS['impedances']['cell'+str(i)+'_impedance']['text']
+                                            dbusservice["/Impedances/Cell"+str(i)] = str(BMS_STATUS['impedances']['cell'+str(i)+'_impedance']['value'])
                                             dbusservice["/Raw/Impedances/Cell"+str(i)] = BMS_STATUS['impedances']['cell'+str(i)+'_impedance']['value']
 
 
@@ -1536,13 +1536,13 @@ def parse_packet(packet):
                                     BMS_STATUS['impedances']['agg_impedances']['diff']['text']  = "{:.1f}".format(BMS_STATUS['impedances']['agg_impedances']['diff']['value']) + "m" + SPECIAL_DISPLAY_SYMBOLS['ohm']
 
                                     if args.victron:
-                                        dbusservice["/Impedances/Sum"]      = BMS_STATUS['impedances']['agg_impedances']['sum']['text']
+                                        dbusservice["/Impedances/Sum"]      = str(BMS_STATUS['impedances']['agg_impedances']['sum']['value'])
                                         dbusservice["/Raw/Impedances/Sum"]  = BMS_STATUS['impedances']['agg_impedances']['sum']['value']
-                                        dbusservice["/Impedances/Max"]      = BMS_STATUS['impedances']['agg_impedances']['max']['text']
+                                        dbusservice["/Impedances/Max"]      = str(BMS_STATUS['impedances']['agg_impedances']['max']['value'])
                                         dbusservice["/Raw/Impedances/Max"]  = BMS_STATUS['impedances']['agg_impedances']['max']['value']
-                                        dbusservice["/Impedances/Min"]      = BMS_STATUS['impedances']['agg_impedances']['min']['text']
+                                        dbusservice["/Impedances/Min"]      = str(BMS_STATUS['impedances']['agg_impedances']['min']['value'])
                                         dbusservice["/Raw/Impedances/Min"]  = BMS_STATUS['impedances']['agg_impedances']['min']['value']
-                                        dbusservice["/Impedances/Diff"]     = BMS_STATUS['impedances']['agg_impedances']['diff']['text']
+                                        dbusservice["/Impedances/Diff"]     = str(BMS_STATUS['impedances']['agg_impedances']['diff']['value'])
                                         dbusservice["/Raw/Impedances/Diff"] = BMS_STATUS['impedances']['agg_impedances']['diff']['value']
 
 
