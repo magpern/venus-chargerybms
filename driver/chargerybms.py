@@ -19,9 +19,9 @@ os.environ['TZ'] = 'Europe/Berlin'
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S') #,
-    #filename='/home/root/log.txt')
+    level=logging.DEBUG,
+    datefmt='%Y-%m-%d %H:%M:%S',
+    filename='/home/root/log.txt')
 
 
 # connect and register to dbus
@@ -891,15 +891,8 @@ def parse_packet(packet):
                                         dbusservice["/Raw/Info/CurrentMode"] = BMS_STATUS['bms']['current_mode']['value']
                                         dbusservice["/Raw/Info/Current"]     = BMS_STATUS['bms']['current']['value']
                                         watt = BMS_STATUS['bms']['current']['value'] * BMS_STATUS['voltages']['agg_voltages']['sum']['value']
-
-                                        if (bms_current_mode == 0x00):
-                                            # Discharge
-                                            dbusservice["/Dc/0/Current"]     = -1 * BMS_STATUS['bms']['current']['value']
-                                            dbusservice["/Dc/0/Power"]       = -1 * watt
-                                        else:
-                                            # Charging and idle
-                                            dbusservice["/Dc/0/Current"]     = BMS_STATUS['bms']['current']['value']
-                                            dbusservice["/Dc/0/Power"]       = watt
+                                        dbusservice["/Dc/0/Current"]     = BMS_STATUS['bms']['current']['value']
+                                        dbusservice["/Dc/0/Power"]       = watt
 
 
                                     # current temperatures
