@@ -1268,6 +1268,7 @@ def parse_packet(packet):
                                     if args.victron:
                                         dbusservice["/Voltages/Sum"]      = BMS_STATUS['voltages']['agg_voltages']['sum']['text']
                                         dbusservice["/Raw/Voltages/Sum"]  = BMS_STATUS['voltages']['agg_voltages']['sum']['value']
+                                        dbusservice["/Dc/0/Voltage"]      = BMS_STATUS['voltages']['agg_voltages']['sum']['value']
                                         dbusservice["/Voltages/Max"]      = BMS_STATUS['voltages']['agg_voltages']['max']['text']
                                         dbusservice["/Raw/Voltages/Max"]  = BMS_STATUS['voltages']['agg_voltages']['max']['value']
                                         dbusservice["/Voltages/Min"]      = BMS_STATUS['voltages']['agg_voltages']['min']['text']
