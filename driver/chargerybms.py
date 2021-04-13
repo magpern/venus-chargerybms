@@ -19,9 +19,9 @@ os.environ['TZ'] = 'Europe/Berlin'
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.DEBUG,
-    datefmt='%Y-%m-%d %H:%M:%S',
-    filename='/home/root/log.txt')
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S') #,
+    #filename='/home/root/log.txt')
 
 
 # connect and register to dbus
